@@ -2056,6 +2056,8 @@ function _submitRequest(params, callback) {
         var jsonRes;
         if (rawBody) {
             jsonRes = {};
+            jsonRes.headers = response.headers;
+            jsonRes.headers = response.statusCode;
             jsonRes.body = body;
         } else {
             try {
@@ -2063,6 +2065,7 @@ function _submitRequest(params, callback) {
             } catch (e) {
                 jsonRes = body || {};
             }
+            jsonRes.headers = response.headers;
             // 请求返回码不为 200
             var statusCode = response.statusCode;
             var statusSuccess = Math.floor(statusCode / 100) === 2; // 200 202 204 206
