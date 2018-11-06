@@ -2054,25 +2054,27 @@ function _submitRequest(params, callback) {
         }
 
         var jsonRes;
-        try {
-            jsonRes = util.xml2json(body) || {};
-        } catch (e) {
-            jsonRes = body || {};
-        }
-
-        // 请求返回码不为 200
-        var statusCode = response.statusCode;
-        var statusSuccess = Math.floor(statusCode / 100) === 2; // 200 202 204 206
-        if (!statusSuccess) {
-            cb({error: jsonRes.Error || jsonRes});
-            return;
-        }
-
-        // 不对 body 进行转换，body 直接挂载返回
         if (rawBody) {
             jsonRes = {};
             jsonRes.body = body;
+        } else {
+            try {
+            jsonRes = util.xml2json(body) || {};
+            } catch (e) {
+                jsonRes = body || {};
+            }
+            // 请求返回码不为 200
+            var statusCode = response.statusCode;
+            var statusSuccess = Math.floor(statusCode / 100) === 2; // 200 202 204 206
+            if (!statusSuccess) {
+                cb({error: jsonRes.Error || jsonRes});
+                return;
+            }
+
         }
+
+       
+        // 不对 body 进行转换，body 直接挂载返回
 
         if (jsonRes.Error) {
             cb({error: jsonRes.Error});
