@@ -2002,6 +2002,7 @@ function _submitRequest(params, callback) {
         qs: params.qs,
         body: body,
         json: json,
+        rawBody: rawBody
     };
 
     // 获取签名
@@ -2024,7 +2025,6 @@ function _submitRequest(params, callback) {
             params.onProgress({loaded: loaded, total: contentLength});
         };
     }
-
     self.emit('before-send', opt);
     var sender = REQUEST(opt, function (err, response, body) {
 
@@ -2076,7 +2076,7 @@ function _submitRequest(params, callback) {
 
         }
 
-       
+
         // 不对 body 进行转换，body 直接挂载返回
 
         if (jsonRes.Error) {
