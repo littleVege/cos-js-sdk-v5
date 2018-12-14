@@ -1816,7 +1816,9 @@ function getUrl(params) {
     }
     url += '/';
     if (object) {
-        url += encodeURIComponent(object).replace(/%2F/g, '/');
+        url += encodeURIComponent(object)
+            .replace(/%2F/g, '/')
+            .replace(/%3F/g, '?');
     }
 
     if (params.isLocation) {
