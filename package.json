@@ -1,7 +1,7 @@
 {
-  "name": "cos-js-sdk-v5",
-  "version": "0.4.22",
-  "description": "cos js sdk v5",
+  "name": "cos-js-sdk-v5-nio",
+  "version": "0.1.0",
+  "description": "cos js sdk v5 with nio fix",
   "main": "index.js",
   "scripts": {
     "dev": "SET NODE_ENV=development&& webpack -w",

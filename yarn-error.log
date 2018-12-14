@@ -1,0 +1,68 @@
+Arguments: 
+  /usr/local/Cellar/node/9.11.1/bin/node /usr/local/Cellar/yarn/1.6.0/libexec/bin/yarn.js publish --registry http://npm-registry.nevint.com/repository/npm-host/
+
+PATH: 
+  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+Yarn version: 
+  1.6.0
+
+Node version: 
+  9.11.1
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (/usr/local/Cellar/yarn/1.6.0/libexec/lib/cli.js:129516:13)
+      at Interface.emit (events.js:180:13)
+      at Interface._ttyWrite (readline.js:783:16)
+      at ReadStream.onkeypress (readline.js:163:10)
+      at ReadStream.emit (events.js:180:13)
+      at emitKeys (internal/readline.js:422:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (readline.js:1019:36)
+      at ReadStream.emit (events.js:180:13)
+      at addChunk (_stream_readable.js:274:12)
+
+npm manifest: 
+  {
+    "name": "cos-js-sdk-v5",
+    "version": "0.4.22",
+    "description": "cos js sdk v5",
+    "main": "index.js",
+    "scripts": {
+      "dev": "SET NODE_ENV=development&& webpack -w",
+      "build": "SET NODE_ENV=production&& webpack",
+      "sts.js": "node server/sts.js",
+      "sts-auth.js": "node server/sts-auth.js"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/tencentyun/cos-js-sdk-v5.git"
+    },
+    "keywords": [],
+    "author": "carsonxu",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/tencentyun/cos-js-sdk-v5/issues"
+    },
+    "homepage": "https://github.com/tencentyun/cos-js-sdk-v5#readme",
+    "dependencies": {
+      "querystring": "^0.2.0",
+      "xmldom": "^0.1.27"
+    },
+    "devDependencies": {
+      "babel-core": "^6.26.0",
+      "babel-loader": "^7.1.2",
+      "request": "^2.87.0",
+      "webpack": "^3.8.1"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

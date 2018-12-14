@@ -1677,6 +1677,7 @@ function getObjectUrl(params, callback) {
         bucket: params.Bucket,
         region: params.Region,
         object: params.Key,
+        type: params.Type,
     });
     if (params.Sign !== undefined && !params.Sign) {
         callback(null, {Url: url});
@@ -1778,12 +1779,13 @@ function getUrl(params) {
     var domain = params.domain;
     var region = params.region;
     var object = params.object;
+    var type = params.type || 'cos';
     var protocol = params.protocol || (util.isBrowser && location.protocol === 'http:' ? 'http:' : 'https:');
     if (!domain) {
         if (['cn-south', 'cn-south-2', 'cn-north', 'cn-east', 'cn-southwest', 'sg'].indexOf(region) > -1) {
             domain = '{Region}.myqcloud.com';
         } else {
-            domain = 'cos.{Region}.myqcloud.com';
+            domain = '{Type}.{Region}.myqcloud.com';
         }
         if (!params.ForcePathStyle) {
             domain = '{Bucket}.' + domain;
@@ -1796,6 +1798,7 @@ function getUrl(params) {
     domain = domain.replace(/\{AppId\}/ig, appId)
         .replace(/\{BucketName\}/ig, shortBucket)
         .replace(/\{Bucket\}/ig, longBucket)
+        .replace(/\{Type\}/ig, type)
         .replace(/\{Region\}/ig, region)
         .replace(/\{.*?\}/ig, '');
     if (!/^[a-zA-Z]+:\/\//.test(domain)) {
