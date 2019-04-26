@@ -16,14 +16,14 @@ var util = require('./util');
  *     @return  {Boolean}  data.BucketAuth      是否有 Bucket 的访问权限
  */
 function headBucket(params, callback) {
-    submitRequest.call(this, {
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        method: 'HEAD',
-    }, function (err, data) {
-        callback(err, data);
-    });
+  submitRequest.call(this, {
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    method: 'HEAD',
+  }, function (err, data) {
+    callback(err, data);
+  });
 }
 
 /**
@@ -42,40 +42,40 @@ function headBucket(params, callback) {
  *     @return  {Object}  data.ListBucketResult     返回的 object 列表信息
  */
 function getBucket(params, callback) {
-    var reqParams = {};
-    reqParams['prefix'] = params['Prefix'];
-    reqParams['delimiter'] = params['Delimiter'];
-    reqParams['marker'] = params['Marker'];
-    reqParams['max-keys'] = params['MaxKeys'];
-    reqParams['encoding-type'] = params['EncodingType'];
+  var reqParams = {};
+  reqParams['prefix'] = params['Prefix'];
+  reqParams['delimiter'] = params['Delimiter'];
+  reqParams['marker'] = params['Marker'];
+  reqParams['max-keys'] = params['MaxKeys'];
+  reqParams['encoding-type'] = params['EncodingType'];
 
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        qs: reqParams,
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        var ListBucketResult = data.ListBucketResult || {};
-        var Contents = ListBucketResult.Contents || [];
-        var CommonPrefixes = ListBucketResult.CommonPrefixes || [];
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    qs: reqParams,
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    var ListBucketResult = data.ListBucketResult || {};
+    var Contents = ListBucketResult.Contents || [];
+    var CommonPrefixes = ListBucketResult.CommonPrefixes || [];
 
-        Contents = util.isArray(Contents) ? Contents : [Contents];
-        CommonPrefixes = util.isArray(CommonPrefixes) ? CommonPrefixes : [CommonPrefixes];
+    Contents = util.isArray(Contents) ? Contents : [Contents];
+    CommonPrefixes = util.isArray(CommonPrefixes) ? CommonPrefixes : [CommonPrefixes];
 
-        var result = util.clone(ListBucketResult);
-        util.extend(result, {
-            Contents: Contents,
-            CommonPrefixes: CommonPrefixes,
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-
-        callback(null, result);
+    var result = util.clone(ListBucketResult);
+    util.extend(result, {
+      Contents: Contents,
+      CommonPrefixes: CommonPrefixes,
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+
+    callback(null, result);
+  });
 }
 
 /**
@@ -89,22 +89,22 @@ function getBucket(params, callback) {
  *     @return  {String}  data.Location     操作地址
  */
 function deleteBucket(params, callback) {
-    submitRequest.call(this, {
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        method: 'DELETE',
-    }, function (err, data) {
-        if (err && err.statusCode === 204) {
-            return callback(null, {statusCode: err.statusCode});
-        } else if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    method: 'DELETE',
+  }, function (err, data) {
+    if (err && err.statusCode === 204) {
+      return callback(null, {statusCode: err.statusCode});
+    } else if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 /**
@@ -118,32 +118,32 @@ function deleteBucket(params, callback) {
  *     @return  {Object}  data.AccessControlPolicy  访问权限信息
  */
 function getBucketAcl(params, callback) {
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'acl',
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        var AccessControlPolicy = data.AccessControlPolicy || {};
-        var Owner = AccessControlPolicy.Owner || {};
-        var Grant = AccessControlPolicy.AccessControlList.Grant || [];
-        Grant = util.isArray(Grant) ? Grant : [Grant];
-        var result = decodeAcl(AccessControlPolicy);
-        if (data.headers && data.headers['x-cos-acl']) {
-            result.ACL = data.headers['x-cos-acl'];
-        }
-        result = util.extend(result, {
-            Owner: Owner,
-            Grants: Grant,
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-        callback(null, result);
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'acl',
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    var AccessControlPolicy = data.AccessControlPolicy || {};
+    var Owner = AccessControlPolicy.Owner || {};
+    var Grant = AccessControlPolicy.AccessControlList.Grant || [];
+    Grant = util.isArray(Grant) ? Grant : [Grant];
+    var result = decodeAcl(AccessControlPolicy);
+    if (data.headers && data.headers['x-cos-acl']) {
+      result.ACL = data.headers['x-cos-acl'];
+    }
+    result = util.extend(result, {
+      Owner: Owner,
+      Grants: Grant,
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+    callback(null, result);
+  });
 }
 
 /**
@@ -160,45 +160,45 @@ function getBucketAcl(params, callback) {
  * @return  {Object}  data                          返回的数据
  */
 function putBucketAcl(params, callback) {
-    var headers = params.Headers;
+  var headers = params.Headers;
 
-    var xml = '';
-    if (params['AccessControlPolicy']) {
-        var AccessControlPolicy = util.clone(params['AccessControlPolicy'] || {});
-        var Grants = AccessControlPolicy.Grants || AccessControlPolicy.Grant;
-        Grants = util.isArray(Grants) ? Grants : [Grants];
-        delete AccessControlPolicy.Grant;
-        delete AccessControlPolicy.Grants;
-        AccessControlPolicy.AccessControlList = {Grant: Grants};
-        xml = util.json2xml({AccessControlPolicy: AccessControlPolicy});
+  var xml = '';
+  if (params['AccessControlPolicy']) {
+    var AccessControlPolicy = util.clone(params['AccessControlPolicy'] || {});
+    var Grants = AccessControlPolicy.Grants || AccessControlPolicy.Grant;
+    Grants = util.isArray(Grants) ? Grants : [Grants];
+    delete AccessControlPolicy.Grant;
+    delete AccessControlPolicy.Grants;
+    AccessControlPolicy.AccessControlList = {Grant: Grants};
+    xml = util.json2xml({AccessControlPolicy: AccessControlPolicy});
 
-        headers['Content-Type'] = 'application/xml';
-        headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+    headers['Content-Type'] = 'application/xml';
+    headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+  }
+
+  // Grant Header 去重
+  util.each(headers, function (val, key) {
+    if (key.indexOf('x-cos-grant-') === 0) {
+      headers[key] = uniqGrant(headers[key]);
     }
+  });
 
-    // Grant Header 去重
-    util.each(headers, function (val, key) {
-        if (key.indexOf('x-cos-grant-') === 0) {
-            headers[key] = uniqGrant(headers[key]);
-        }
+  submitRequest.call(this, {
+    method: 'PUT',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: headers,
+    action: 'acl',
+    body: xml,
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
-
-    submitRequest.call(this, {
-        method: 'PUT',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: headers,
-        action: 'acl',
-        body: xml,
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-    });
+  });
 }
 
 /**
@@ -212,45 +212,45 @@ function putBucketAcl(params, callback) {
  *     @return  {Object}  data.CORSRules            Bucket的跨域设置
  */
 function getBucketCors(params, callback) {
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'cors',
-    }, function (err, data) {
-        if (err) {
-            if (err.statusCode === 404 && err.error && err.error.Code === 'NoSuchCORSConfiguration') {
-                var result = {
-                    CORSRules: [],
-                    statusCode: err.statusCode,
-                };
-                err.headers && (result.headers = err.headers);
-                callback(null, result);
-            } else {
-                callback(err);
-            }
-            return;
-        }
-        var CORSConfiguration = data.CORSConfiguration || {};
-        var CORSRules = CORSConfiguration.CORSRules || CORSConfiguration.CORSRule || [];
-        CORSRules = util.clone(util.isArray(CORSRules) ? CORSRules : [CORSRules]);
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'cors',
+  }, function (err, data) {
+    if (err) {
+      if (err.statusCode === 404 && err.error && err.error.Code === 'NoSuchCORSConfiguration') {
+        var result = {
+          CORSRules: [],
+          statusCode: err.statusCode,
+        };
+        err.headers && (result.headers = err.headers);
+        callback(null, result);
+      } else {
+        callback(err);
+      }
+      return;
+    }
+    var CORSConfiguration = data.CORSConfiguration || {};
+    var CORSRules = CORSConfiguration.CORSRules || CORSConfiguration.CORSRule || [];
+    CORSRules = util.clone(util.isArray(CORSRules) ? CORSRules : [CORSRules]);
 
-        util.each(CORSRules, function (rule) {
-            util.each(['AllowedOrigin', 'AllowedHeader', 'AllowedMethod', 'ExposeHeader'], function (key, j) {
-                var sKey = key + 's';
-                var val = rule[sKey] || rule[key] || [];
-                delete rule[key];
-                rule[sKey] = util.isArray(val) ? val : [val];
-            });
-        });
-
-        callback(null, {
-            CORSRules: CORSRules,
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+    util.each(CORSRules, function (rule) {
+      util.each(['AllowedOrigin', 'AllowedHeader', 'AllowedMethod', 'ExposeHeader'], function (key, j) {
+        var sKey = key + 's';
+        var val = rule[sKey] || rule[key] || [];
+        delete rule[key];
+        rule[sKey] = util.isArray(val) ? val : [val];
+      });
     });
+
+    callback(null, {
+      CORSRules: CORSRules,
+      statusCode: data.statusCode,
+      headers: data.headers,
+    });
+  });
 }
 
 /**
@@ -266,40 +266,40 @@ function getBucketCors(params, callback) {
  */
 function putBucketCors(params, callback) {
 
-    var CORSConfiguration = params['CORSConfiguration'] || {};
-    var CORSRules = CORSConfiguration['CORSRules'] || params['CORSRules'] || [];
-    CORSRules = util.clone(util.isArray(CORSRules) ? CORSRules : [CORSRules]);
-    util.each(CORSRules, function (rule) {
-        util.each(['AllowedOrigin', 'AllowedHeader', 'AllowedMethod', 'ExposeHeader'], function (key, k) {
-            var sKey = key + 's';
-            var val = rule[sKey] || rule[key] || [];
-            delete rule[sKey];
-            rule[key] = util.isArray(val) ? val : [val];
-        });
+  var CORSConfiguration = params['CORSConfiguration'] || {};
+  var CORSRules = CORSConfiguration['CORSRules'] || params['CORSRules'] || [];
+  CORSRules = util.clone(util.isArray(CORSRules) ? CORSRules : [CORSRules]);
+  util.each(CORSRules, function (rule) {
+    util.each(['AllowedOrigin', 'AllowedHeader', 'AllowedMethod', 'ExposeHeader'], function (key, k) {
+      var sKey = key + 's';
+      var val = rule[sKey] || rule[key] || [];
+      delete rule[sKey];
+      rule[key] = util.isArray(val) ? val : [val];
     });
+  });
 
-    var xml = util.json2xml({CORSConfiguration: {CORSRule: CORSRules}});
+  var xml = util.json2xml({CORSConfiguration: {CORSRule: CORSRules}});
 
-    var headers = params.Headers;
-    headers['Content-Type'] = 'application/xml';
-    headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+  var headers = params.Headers;
+  headers['Content-Type'] = 'application/xml';
+  headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
 
-    submitRequest.call(this, {
-        method: 'PUT',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        body: xml,
-        action: 'cors',
-        headers: headers,
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'PUT',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    body: xml,
+    action: 'cors',
+    headers: headers,
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 /**
@@ -312,61 +312,61 @@ function putBucketCors(params, callback) {
  * @return  {Object}  data                  返回的数据
  */
 function deleteBucketCors(params, callback) {
-    submitRequest.call(this, {
-        method: 'DELETE',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'cors',
-    }, function (err, data) {
-        if (err && err.statusCode === 204) {
-            return callback(null, {statusCode: err.statusCode});
-        } else if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode || err.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'DELETE',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'cors',
+  }, function (err, data) {
+    if (err && err.statusCode === 204) {
+      return callback(null, {statusCode: err.statusCode});
+    } else if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode || err.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 function putBucketPolicy(params, callback) {
-    var Policy = params['Policy'];
-    var PolicyStr = Policy;
-    try {
-        if (typeof Policy === 'string') {
-            Policy = JSON.parse(PolicyStr);
-        } else {
-            PolicyStr = JSON.stringify(Policy);
-        }
-    } catch (e) {
-        callback({error: 'Policy format error'});
+  var Policy = params['Policy'];
+  var PolicyStr = Policy;
+  try {
+    if (typeof Policy === 'string') {
+      Policy = JSON.parse(PolicyStr);
+    } else {
+      PolicyStr = JSON.stringify(Policy);
     }
+  } catch (e) {
+    callback({error: 'Policy format error'});
+  }
 
-    var headers = params.Headers;
-    headers['Content-Type'] = 'application/json';
-    headers['Content-MD5'] = util.binaryBase64(util.md5(PolicyStr));
+  var headers = params.Headers;
+  headers['Content-Type'] = 'application/json';
+  headers['Content-MD5'] = util.binaryBase64(util.md5(PolicyStr));
 
-    submitRequest.call(this, {
-        method: 'PUT',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        action: 'policy',
-        body: util.isBrowser ? PolicyStr : Policy,
-        headers: headers,
-        json: true,
-    }, function (err, data) {
-        if (err && err.statusCode === 204) {
-            return callback(null, {statusCode: err.statusCode});
-        } else if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'PUT',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    action: 'policy',
+    body: util.isBrowser ? PolicyStr : Policy,
+    headers: headers,
+    json: true,
+  }, function (err, data) {
+    if (err && err.statusCode === 204) {
+      return callback(null, {statusCode: err.statusCode});
+    } else if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 /**
@@ -379,23 +379,23 @@ function putBucketPolicy(params, callback) {
  * @return  {Object}  data                  返回的数据
  */
 function deleteBucketPolicy(params, callback) {
-    submitRequest.call(this, {
-        method: 'DELETE',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'policy',
-    }, function (err, data) {
-        if (err && err.statusCode === 204) {
-            return callback(null, {statusCode: err.statusCode});
-        } else if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode || err.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'DELETE',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'policy',
+  }, function (err, data) {
+    if (err && err.statusCode === 204) {
+      return callback(null, {statusCode: err.statusCode});
+    } else if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode || err.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 /**
@@ -408,18 +408,18 @@ function deleteBucketPolicy(params, callback) {
  * @return  {Object}  data              返回数据，包含地域信息 LocationConstraint
  */
 function getBucketLocation(params, callback) {
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'location',
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        callback(null, data);
-    });
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'location',
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    callback(null, data);
+  });
 }
 
 /**
@@ -432,37 +432,37 @@ function getBucketLocation(params, callback) {
  * @return  {Object}  data              返回数据
  */
 function getBucketPolicy(params, callback) {
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'policy',
-        rawBody: true,
-    }, function (err, data) {
-        if (err) {
-            if (err.statusCode && err.statusCode === 403) {
-                return callback({ErrorStatus: 'Access Denied'});
-            }
-            if (err.statusCode && err.statusCode === 405) {
-                return callback({ErrorStatus: 'Method Not Allowed'});
-            }
-            if (err.statusCode && err.statusCode === 404) {
-                return callback({ErrorStatus: 'Policy Not Found'});
-            }
-            return callback(err);
-        }
-        var Policy = {};
-        try {
-            Policy = JSON.parse(data.body);
-        } catch (e) {
-        }
-        callback(null, {
-            Policy: Policy,
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'policy',
+    rawBody: true,
+  }, function (err, data) {
+    if (err) {
+      if (err.statusCode && err.statusCode === 403) {
+        return callback({ErrorStatus: 'Access Denied'});
+      }
+      if (err.statusCode && err.statusCode === 405) {
+        return callback({ErrorStatus: 'Method Not Allowed'});
+      }
+      if (err.statusCode && err.statusCode === 404) {
+        return callback({ErrorStatus: 'Policy Not Found'});
+      }
+      return callback(err);
+    }
+    var Policy = {};
+    try {
+      Policy = JSON.parse(data.body);
+    } catch (e) {
+    }
+    callback(null, {
+      Policy: Policy,
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 /**
@@ -475,38 +475,38 @@ function getBucketPolicy(params, callback) {
  * @return  {Object}  data              返回数据
  */
 function getBucketTagging(params, callback) {
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'tagging',
-    }, function (err, data) {
-        if (err) {
-            if (err.statusCode === 404 && err.error && (err.error === "Not Found" || err.error.Code === 'NoSuchTagSet')) {
-                var result = {
-                    Tags: [],
-                    statusCode: err.statusCode,
-                };
-                err.headers && (result.headers = err.headers);
-                callback(null, result);
-            } else {
-                callback(err);
-            }
-            return;
-        }
-        var Tags = [];
-        try {
-            Tags = data.Tagging.TagSet.Tag || [];
-        } catch (e) {
-        }
-        Tags = util.clone(util.isArray(Tags) ? Tags : [Tags]);
-        callback(null, {
-            Tags: Tags,
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'tagging',
+  }, function (err, data) {
+    if (err) {
+      if (err.statusCode === 404 && err.error && (err.error === "Not Found" || err.error.Code === 'NoSuchTagSet')) {
+        var result = {
+          Tags: [],
+          statusCode: err.statusCode,
+        };
+        err.headers && (result.headers = err.headers);
+        callback(null, result);
+      } else {
+        callback(err);
+      }
+      return;
+    }
+    var Tags = [];
+    try {
+      Tags = data.Tagging.TagSet.Tag || [];
+    } catch (e) {
+    }
+    Tags = util.clone(util.isArray(Tags) ? Tags : [Tags]);
+    callback(null, {
+      Tags: Tags,
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 /**
@@ -521,33 +521,33 @@ function getBucketTagging(params, callback) {
  */
 function putBucketTagging(params, callback) {
 
-    var Tagging = params['Tagging'] || {};
-    var Tags = Tagging.TagSet || Tagging.Tags || params['Tags'] || [];
-    Tags = util.clone(util.isArray(Tags) ? Tags : [Tags]);
-    var xml = util.json2xml({Tagging: {TagSet: {Tag: Tags}}});
+  var Tagging = params['Tagging'] || {};
+  var Tags = Tagging.TagSet || Tagging.Tags || params['Tags'] || [];
+  Tags = util.clone(util.isArray(Tags) ? Tags : [Tags]);
+  var xml = util.json2xml({Tagging: {TagSet: {Tag: Tags}}});
 
-    var headers = params.Headers;
-    headers['Content-Type'] = 'application/xml';
-    headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+  var headers = params.Headers;
+  headers['Content-Type'] = 'application/xml';
+  headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
 
-    submitRequest.call(this, {
-        method: 'PUT',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        body: xml,
-        action: 'tagging',
-        headers: headers,
-    }, function (err, data) {
-        if (err && err.statusCode === 204) {
-            return callback(null, {statusCode: err.statusCode});
-        } else if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'PUT',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    body: xml,
+    action: 'tagging',
+    headers: headers,
+  }, function (err, data) {
+    if (err && err.statusCode === 204) {
+      return callback(null, {statusCode: err.statusCode});
+    } else if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 
@@ -561,239 +561,239 @@ function putBucketTagging(params, callback) {
  * @return  {Object}  data              返回的数据
  */
 function deleteBucketTagging(params, callback) {
-    submitRequest.call(this, {
-        method: 'DELETE',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'tagging',
-    }, function (err, data) {
-        if (err && err.statusCode === 204) {
-            return callback(null, {statusCode: err.statusCode});
-        } else if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'DELETE',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'tagging',
+  }, function (err, data) {
+    if (err && err.statusCode === 204) {
+      return callback(null, {statusCode: err.statusCode});
+    } else if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 function putBucketLifecycle(params, callback) {
 
-    var LifecycleConfiguration = params['LifecycleConfiguration'] || {};
-    var Rules = LifecycleConfiguration.Rules || [];
-    Rules = util.clone(Rules);
-    var xml = util.json2xml({LifecycleConfiguration: {Rule: Rules}});
+  var LifecycleConfiguration = params['LifecycleConfiguration'] || {};
+  var Rules = LifecycleConfiguration.Rules || [];
+  Rules = util.clone(Rules);
+  var xml = util.json2xml({LifecycleConfiguration: {Rule: Rules}});
 
-    var headers = params.Headers;
-    headers['Content-Type'] = 'application/xml';
-    headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+  var headers = params.Headers;
+  headers['Content-Type'] = 'application/xml';
+  headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
 
-    submitRequest.call(this, {
-        method: 'PUT',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        body: xml,
-        action: 'lifecycle',
-        headers: headers,
-    }, function (err, data) {
-        if (err && err.statusCode === 204) {
-            return callback(null, {statusCode: err.statusCode});
-        } else if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'PUT',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    body: xml,
+    action: 'lifecycle',
+    headers: headers,
+  }, function (err, data) {
+    if (err && err.statusCode === 204) {
+      return callback(null, {statusCode: err.statusCode});
+    } else if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 function getBucketLifecycle(params, callback) {
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'lifecycle',
-    }, function (err, data) {
-        if (err) {
-            if (err.statusCode === 404 && err.error && err.error.Code === 'NoSuchLifecycleConfiguration') {
-                var result = {
-                    Rules: [],
-                    statusCode: err.statusCode,
-                };
-                err.headers && (result.headers = err.headers);
-                callback(null, result);
-            } else {
-                callback(err);
-            }
-            return;
-        }
-        var Rules = [];
-        try {
-            Rules = data.LifecycleConfiguration.Rule || [];
-        } catch (e) {
-        }
-        Rules = util.clone(util.isArray(Rules) ? Rules : [Rules]);
-        callback(null, {
-            Rules: Rules,
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'lifecycle',
+  }, function (err, data) {
+    if (err) {
+      if (err.statusCode === 404 && err.error && err.error.Code === 'NoSuchLifecycleConfiguration') {
+        var result = {
+          Rules: [],
+          statusCode: err.statusCode,
+        };
+        err.headers && (result.headers = err.headers);
+        callback(null, result);
+      } else {
+        callback(err);
+      }
+      return;
+    }
+    var Rules = [];
+    try {
+      Rules = data.LifecycleConfiguration.Rule || [];
+    } catch (e) {
+    }
+    Rules = util.clone(util.isArray(Rules) ? Rules : [Rules]);
+    callback(null, {
+      Rules: Rules,
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 function deleteBucketLifecycle(params, callback) {
-    submitRequest.call(this, {
-        method: 'DELETE',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'lifecycle',
-    }, function (err, data) {
-        if (err && err.statusCode === 204) {
-            return callback(null, {statusCode: err.statusCode});
-        } else if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'DELETE',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'lifecycle',
+  }, function (err, data) {
+    if (err && err.statusCode === 204) {
+      return callback(null, {statusCode: err.statusCode});
+    } else if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 function putBucketVersioning(params, callback) {
 
-    if (!params['VersioningConfiguration']) {
-        callback({error: 'missing param VersioningConfiguration'});
-        return;
+  if (!params['VersioningConfiguration']) {
+    callback({error: 'missing param VersioningConfiguration'});
+    return;
+  }
+  var VersioningConfiguration = params['VersioningConfiguration'] || {};
+  var xml = util.json2xml({VersioningConfiguration: VersioningConfiguration});
+
+  var headers = params.Headers;
+  headers['Content-Type'] = 'application/xml';
+  headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+
+  submitRequest.call(this, {
+    method: 'PUT',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    body: xml,
+    action: 'versioning',
+    headers: headers,
+  }, function (err, data) {
+    if (err && err.statusCode === 204) {
+      return callback(null, {statusCode: err.statusCode});
+    } else if (err) {
+      return callback(err);
     }
-    var VersioningConfiguration = params['VersioningConfiguration'] || {};
-    var xml = util.json2xml({VersioningConfiguration: VersioningConfiguration});
-
-    var headers = params.Headers;
-    headers['Content-Type'] = 'application/xml';
-    headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
-
-    submitRequest.call(this, {
-        method: 'PUT',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        body: xml,
-        action: 'versioning',
-        headers: headers,
-    }, function (err, data) {
-        if (err && err.statusCode === 204) {
-            return callback(null, {statusCode: err.statusCode});
-        } else if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 function getBucketVersioning(params, callback) {
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'versioning',
-    }, function (err, data) {
-        if (!err) {
-            !data.VersioningConfiguration && (data.VersioningConfiguration = {});
-        }
-        callback(err, data);
-    });
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'versioning',
+  }, function (err, data) {
+    if (!err) {
+      !data.VersioningConfiguration && (data.VersioningConfiguration = {});
+    }
+    callback(err, data);
+  });
 }
 
 function putBucketReplication(params, callback) {
-    var ReplicationConfiguration = util.clone(params.ReplicationConfiguration);
-    var xml = util.json2xml({ReplicationConfiguration: ReplicationConfiguration});
-    xml = xml.replace(/<(\/?)Rules>/ig, '<$1Rule>');
-    xml = xml.replace(/<(\/?)Tags>/ig, '<$1Tag>');
+  var ReplicationConfiguration = util.clone(params.ReplicationConfiguration);
+  var xml = util.json2xml({ReplicationConfiguration: ReplicationConfiguration});
+  xml = xml.replace(/<(\/?)Rules>/ig, '<$1Rule>');
+  xml = xml.replace(/<(\/?)Tags>/ig, '<$1Tag>');
 
-    var headers = params.Headers;
-    headers['Content-Type'] = 'application/xml';
-    headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+  var headers = params.Headers;
+  headers['Content-Type'] = 'application/xml';
+  headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
 
-    submitRequest.call(this, {
-        method: 'PUT',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        body: xml,
-        action: 'replication',
-        headers: headers,
-    }, function (err, data) {
-        if (err && err.statusCode === 204) {
-            return callback(null, {statusCode: err.statusCode});
-        } else if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'PUT',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    body: xml,
+    action: 'replication',
+    headers: headers,
+  }, function (err, data) {
+    if (err && err.statusCode === 204) {
+      return callback(null, {statusCode: err.statusCode});
+    } else if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 function getBucketReplication(params, callback) {
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'replication',
-    }, function (err, data) {
-        if (err) {
-            if (err.statusCode === 404 && err.error && (err.error === 'Not Found' || err.error.Code === 'ReplicationConfigurationnotFoundError')) {
-                var result = {
-                    ReplicationConfiguration: {Rules: []},
-                    statusCode: err.statusCode,
-                };
-                err.headers && (result.headers = err.headers);
-                callback(null, result);
-            } else {
-                callback(err);
-            }
-            return;
-        }
-        if (!err) {
-            !data.ReplicationConfiguration && (data.ReplicationConfiguration = {});
-        }
-        if (data.ReplicationConfiguration.Rule) {
-            data.ReplicationConfiguration.Rules = data.ReplicationConfiguration.Rule;
-            delete data.ReplicationConfiguration.Rule;
-        }
-        callback(err, data);
-    });
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'replication',
+  }, function (err, data) {
+    if (err) {
+      if (err.statusCode === 404 && err.error && (err.error === 'Not Found' || err.error.Code === 'ReplicationConfigurationnotFoundError')) {
+        var result = {
+          ReplicationConfiguration: {Rules: []},
+          statusCode: err.statusCode,
+        };
+        err.headers && (result.headers = err.headers);
+        callback(null, result);
+      } else {
+        callback(err);
+      }
+      return;
+    }
+    if (!err) {
+      !data.ReplicationConfiguration && (data.ReplicationConfiguration = {});
+    }
+    if (data.ReplicationConfiguration.Rule) {
+      data.ReplicationConfiguration.Rules = data.ReplicationConfiguration.Rule;
+      delete data.ReplicationConfiguration.Rule;
+    }
+    callback(err, data);
+  });
 }
 
 function deleteBucketReplication(params, callback) {
-    submitRequest.call(this, {
-        method: 'DELETE',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        action: 'replication',
-    }, function (err, data) {
-        if (err && err.statusCode === 204) {
-            return callback(null, {statusCode: err.statusCode});
-        } else if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'DELETE',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    action: 'replication',
+  }, function (err, data) {
+    if (err && err.statusCode === 204) {
+      return callback(null, {statusCode: err.statusCode});
+    } else if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 // Object 相关
@@ -811,70 +811,70 @@ function deleteBucketReplication(params, callback) {
  *     @return  {Boolean}  data.NotModified         是否在 IfModifiedSince 时间点之后未修改该 object，则为 true
  */
 function headObject(params, callback) {
-    submitRequest.call(this, {
-        method: 'HEAD',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        VersionId: params.VersionId,
-        headers: params.Headers,
-    }, function (err, data) {
-        if (err) {
-            var statusCode = err.statusCode;
-            if (params.Headers['If-Modified-Since'] && statusCode && statusCode === 304) {
-                return callback(null, {
-                    NotModified: true,
-                    statusCode: statusCode,
-                });
-            }
-            return callback(err);
-        }
-        if (data.headers && data.headers.etag) {
-            data.ETag = data.headers && data.headers.etag;
-        }
-        callback(null, data);
-    });
+  submitRequest.call(this, {
+    method: 'HEAD',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    VersionId: params.VersionId,
+    headers: params.Headers,
+  }, function (err, data) {
+    if (err) {
+      var statusCode = err.statusCode;
+      if (params.Headers['If-Modified-Since'] && statusCode && statusCode === 304) {
+        return callback(null, {
+          NotModified: true,
+          statusCode: statusCode,
+        });
+      }
+      return callback(err);
+    }
+    if (data.headers && data.headers.etag) {
+      data.ETag = data.headers && data.headers.etag;
+    }
+    callback(null, data);
+  });
 }
 
 
 function listObjectVersions(params, callback) {
-    var reqParams = {};
-    reqParams['prefix'] = params['Prefix'];
-    reqParams['delimiter'] = params['Delimiter'];
-    reqParams['key-marker'] = params['KeyMarker'];
-    reqParams['version-id-marker'] = params['VersionIdMarker'];
-    reqParams['max-keys'] = params['MaxKeys'];
-    reqParams['encoding-type'] = params['EncodingType'];
+  var reqParams = {};
+  reqParams['prefix'] = params['Prefix'];
+  reqParams['delimiter'] = params['Delimiter'];
+  reqParams['key-marker'] = params['KeyMarker'];
+  reqParams['version-id-marker'] = params['VersionIdMarker'];
+  reqParams['max-keys'] = params['MaxKeys'];
+  reqParams['encoding-type'] = params['EncodingType'];
 
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        qs: reqParams,
-        action: 'versions',
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        var ListVersionsResult = data.ListVersionsResult || {};
-        var DeleteMarkers = ListVersionsResult.DeleteMarker || [];
-        DeleteMarkers = util.isArray(DeleteMarkers) ? DeleteMarkers : [DeleteMarkers];
-        var Versions = ListVersionsResult.Version || [];
-        Versions = util.isArray(Versions) ? Versions : [Versions];
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    qs: reqParams,
+    action: 'versions',
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    var ListVersionsResult = data.ListVersionsResult || {};
+    var DeleteMarkers = ListVersionsResult.DeleteMarker || [];
+    DeleteMarkers = util.isArray(DeleteMarkers) ? DeleteMarkers : [DeleteMarkers];
+    var Versions = ListVersionsResult.Version || [];
+    Versions = util.isArray(Versions) ? Versions : [Versions];
 
-        var result = util.clone(ListVersionsResult);
-        delete result.DeleteMarker;
-        delete result.Version;
-        util.extend(result, {
-            DeleteMarkers: DeleteMarkers,
-            Versions: Versions,
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-
-        callback(null, result);
+    var result = util.clone(ListVersionsResult);
+    delete result.DeleteMarker;
+    delete result.Version;
+    util.extend(result, {
+      DeleteMarkers: DeleteMarkers,
+      Versions: Versions,
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+
+    callback(null, result);
+  });
 }
 
 /**
@@ -899,48 +899,49 @@ function listObjectVersions(params, callback) {
  * @param  {Object}  data                                   为对应的 object 数据，包括 body 和 headers
  */
 function getObject(params, callback) {
-    var reqParams = {};
+  var reqParams = {};
 
-    reqParams['response-content-type'] = params['ResponseContentType'];
-    reqParams['response-content-language'] = params['ResponseContentLanguage'];
-    reqParams['response-expires'] = params['ResponseExpires'];
-    reqParams['response-cache-control'] = params['ResponseCacheControl'];
-    reqParams['response-content-disposition'] = params['ResponseContentDisposition'];
-    reqParams['response-content-encoding'] = params['ResponseContentEncoding'];
+  reqParams['response-content-type'] = params['ResponseContentType'];
+  reqParams['response-content-language'] = params['ResponseContentLanguage'];
+  reqParams['response-expires'] = params['ResponseExpires'];
+  reqParams['response-cache-control'] = params['ResponseCacheControl'];
+  reqParams['response-content-disposition'] = params['ResponseContentDisposition'];
+  reqParams['response-content-encoding'] = params['ResponseContentEncoding'];
 
-    var BodyType;
+  var BodyType;
 
-    // 如果用户自己传入了 output
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        VersionId: params.VersionId,
-        headers: params.Headers,
-        qs: reqParams,
-        rawBody: true,
-    }, function (err, data) {
-        if (err) {
-            var statusCode = err.statusCode;
-            if (params.Headers['If-Modified-Since'] && statusCode && statusCode === 304) {
-                return callback(null, {
-                    NotModified: true
-                });
-            }
-            return callback(err);
-        }
-        var result = {};
-        result.Body = data.body;
-        if (data.headers && data.headers.etag) {
-            result.ETag = data.headers && data.headers.etag;
-        }
-        util.extend(result, {
-            statusCode: data.statusCode,
-            headers: data.headers,
+  // 如果用户自己传入了 output
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    VersionId: params.VersionId,
+    headers: params.Headers,
+    qs: reqParams,
+    rawBody: true,
+    env: params.ENV
+  }, function (err, data) {
+    if (err) {
+      var statusCode = err.statusCode;
+      if (params.Headers['If-Modified-Since'] && statusCode && statusCode === 304) {
+        return callback(null, {
+          NotModified: true
         });
-        callback(null, result);
+      }
+      return callback(err);
+    }
+    var result = {};
+    result.Body = data.body;
+    if (data.headers && data.headers.etag) {
+      result.ETag = data.headers && data.headers.etag;
+    }
+    util.extend(result, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+    callback(null, result);
+  });
 
 }
 
@@ -972,44 +973,44 @@ function getObject(params, callback) {
  */
 function putObject(params, callback) {
 
-    var self = this;
-    var FileSize = params.ContentLength;
-    var onProgress = util.throttleOnProgress.call(self, FileSize, params.onProgress);
+  var self = this;
+  var FileSize = params.ContentLength;
+  var onProgress = util.throttleOnProgress.call(self, FileSize, params.onProgress);
 
-    submitRequest.call(self, {
-        TaskId: params.TaskId,
-        method: 'PUT',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        headers: params.Headers,
-        body: params.Body,
-        onProgress: onProgress,
-    }, function (err, data) {
-        if (err) {
-            onProgress(null, true);
-            return callback(err);
-        }
-        onProgress({loaded: FileSize, total: FileSize}, true);
-        if (data && data.headers && data.headers['etag']) {
-            var url = getUrl({
-                ForcePathStyle: self.options.ForcePathStyle,
-                protocol: self.options.Protocol,
-                domain: self.options.Domain,
-                bucket: params.Bucket,
-                region: params.Region,
-                object: params.Key,
-            });
-            url = url.substr(url.indexOf('://') + 3);
-            return callback(null, {
-                Location: url,
-                ETag: data.headers['etag'],
-                statusCode: data.statusCode,
-                headers: data.headers,
-            });
-        }
-        callback(null, data);
-    });
+  submitRequest.call(self, {
+    TaskId: params.TaskId,
+    method: 'PUT',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    headers: params.Headers,
+    body: params.Body,
+    onProgress: onProgress,
+  }, function (err, data) {
+    if (err) {
+      onProgress(null, true);
+      return callback(err);
+    }
+    onProgress({loaded: FileSize, total: FileSize}, true);
+    if (data && data.headers && data.headers['etag']) {
+      var url = getUrl({
+        ForcePathStyle: self.options.ForcePathStyle,
+        protocol: self.options.Protocol,
+        domain: self.options.Domain,
+        bucket: params.Bucket,
+        region: params.Region,
+        object: params.Key,
+      });
+      url = url.substr(url.indexOf('://') + 3);
+      return callback(null, {
+        Location: url,
+        ETag: data.headers['etag'],
+        statusCode: data.statusCode,
+        headers: data.headers,
+      });
+    }
+    callback(null, data);
+  });
 }
 
 /**
@@ -1023,29 +1024,29 @@ function putObject(params, callback) {
  * @param  {Object}  data                       删除操作成功之后返回的数据
  */
 function deleteObject(params, callback) {
-    submitRequest.call(this, {
-        method: 'DELETE',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        headers: params.Headers,
-        VersionId: params.VersionId,
-    }, function (err, data) {
-        if (err) {
-            var statusCode = err.statusCode;
-            if (statusCode && statusCode === 204) {
-                return callback(null, {statusCode: statusCode});
-            } else if (statusCode && statusCode === 404) {
-                return callback(null, {BucketNotFound: true, statusCode: statusCode,});
-            } else {
-                return callback(err);
-            }
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  submitRequest.call(this, {
+    method: 'DELETE',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    headers: params.Headers,
+    VersionId: params.VersionId,
+  }, function (err, data) {
+    if (err) {
+      var statusCode = err.statusCode;
+      if (statusCode && statusCode === 204) {
+        return callback(null, {statusCode: statusCode});
+      } else if (statusCode && statusCode === 404) {
+        return callback(null, {BucketNotFound: true, statusCode: statusCode,});
+      } else {
+        return callback(err);
+      }
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 /**
@@ -1061,33 +1062,33 @@ function deleteObject(params, callback) {
  */
 function getObjectAcl(params, callback) {
 
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        headers: params.Headers,
-        action: 'acl',
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        var AccessControlPolicy = data.AccessControlPolicy || {};
-        var Owner = AccessControlPolicy.Owner || {};
-        var Grant = AccessControlPolicy.AccessControlList && AccessControlPolicy.AccessControlList.Grant || [];
-        Grant = util.isArray(Grant) ? Grant : [Grant];
-        var result = decodeAcl(AccessControlPolicy);
-        if (data.headers && data.headers['x-cos-acl']) {
-            result.ACL = data.headers['x-cos-acl'];
-        }
-        result = util.extend(result, {
-            Owner: Owner,
-            Grants: Grant,
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-        callback(null, result);
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    headers: params.Headers,
+    action: 'acl',
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    var AccessControlPolicy = data.AccessControlPolicy || {};
+    var Owner = AccessControlPolicy.Owner || {};
+    var Grant = AccessControlPolicy.AccessControlList && AccessControlPolicy.AccessControlList.Grant || [];
+    Grant = util.isArray(Grant) ? Grant : [Grant];
+    var result = decodeAcl(AccessControlPolicy);
+    if (data.headers && data.headers['x-cos-acl']) {
+      result.ACL = data.headers['x-cos-acl'];
+    }
+    result = util.extend(result, {
+      Owner: Owner,
+      Grants: Grant,
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+    callback(null, result);
+  });
 }
 
 /**
@@ -1101,46 +1102,46 @@ function getObjectAcl(params, callback) {
  * @return  {Object}  data              返回的数据
  */
 function putObjectAcl(params, callback) {
-    var headers = params.Headers;
+  var headers = params.Headers;
 
-    var xml = '';
-    if (params['AccessControlPolicy']) {
-        var AccessControlPolicy = util.clone(params['AccessControlPolicy'] || {});
-        var Grants = AccessControlPolicy.Grants || AccessControlPolicy.Grant;
-        Grants = util.isArray(Grants) ? Grants : [Grants];
-        delete AccessControlPolicy.Grant;
-        delete AccessControlPolicy.Grants;
-        AccessControlPolicy.AccessControlList = {Grant: Grants};
-        xml = util.json2xml({AccessControlPolicy: AccessControlPolicy});
+  var xml = '';
+  if (params['AccessControlPolicy']) {
+    var AccessControlPolicy = util.clone(params['AccessControlPolicy'] || {});
+    var Grants = AccessControlPolicy.Grants || AccessControlPolicy.Grant;
+    Grants = util.isArray(Grants) ? Grants : [Grants];
+    delete AccessControlPolicy.Grant;
+    delete AccessControlPolicy.Grants;
+    AccessControlPolicy.AccessControlList = {Grant: Grants};
+    xml = util.json2xml({AccessControlPolicy: AccessControlPolicy});
 
-        headers['Content-Type'] = 'application/xml';
-        headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+    headers['Content-Type'] = 'application/xml';
+    headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+  }
+
+  // Grant Header 去重
+  util.each(headers, function (val, key) {
+    if (key.indexOf('x-cos-grant-') === 0) {
+      headers[key] = uniqGrant(headers[key]);
     }
+  });
 
-    // Grant Header 去重
-    util.each(headers, function (val, key) {
-        if (key.indexOf('x-cos-grant-') === 0) {
-            headers[key] = uniqGrant(headers[key]);
-        }
+  submitRequest.call(this, {
+    method: 'PUT',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    action: 'acl',
+    headers: headers,
+    body: xml,
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
-
-    submitRequest.call(this, {
-        method: 'PUT',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        action: 'acl',
-        headers: headers,
-        body: xml,
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-    });
+  });
 }
 
 /**
@@ -1155,39 +1156,39 @@ function putObjectAcl(params, callback) {
  */
 function optionsObject(params, callback) {
 
-    var headers = params.Headers;
-    headers['Origin'] = params['Origin'];
-    headers['Access-Control-Request-Method'] = params['AccessControlRequestMethod'];
-    headers['Access-Control-Request-Headers'] = params['AccessControlRequestHeaders'];
+  var headers = params.Headers;
+  headers['Origin'] = params['Origin'];
+  headers['Access-Control-Request-Method'] = params['AccessControlRequestMethod'];
+  headers['Access-Control-Request-Headers'] = params['AccessControlRequestHeaders'];
 
-    submitRequest.call(this, {
-        method: 'OPTIONS',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        headers: headers,
-    }, function (err, data) {
-        if (err) {
-            if (err.statusCode && err.statusCode === 403) {
-                return callback(null, {
-                    OptionsForbidden: true,
-                    statusCode: err.statusCode
-                });
-            }
-            return callback(err);
-        }
-
-        var headers = data.headers || {};
-        callback(null, {
-            AccessControlAllowOrigin: headers['access-control-allow-origin'],
-            AccessControlAllowMethods: headers['access-control-allow-methods'],
-            AccessControlAllowHeaders: headers['access-control-allow-headers'],
-            AccessControlExposeHeaders: headers['access-control-expose-headers'],
-            AccessControlMaxAge: headers['access-control-max-age'],
-            statusCode: data.statusCode,
-            headers: data.headers,
+  submitRequest.call(this, {
+    method: 'OPTIONS',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    headers: headers,
+  }, function (err, data) {
+    if (err) {
+      if (err.statusCode && err.statusCode === 403) {
+        return callback(null, {
+          OptionsForbidden: true,
+          statusCode: err.statusCode
         });
+      }
+      return callback(err);
+    }
+
+    var headers = data.headers || {};
+    callback(null, {
+      AccessControlAllowOrigin: headers['access-control-allow-origin'],
+      AccessControlAllowMethods: headers['access-control-allow-methods'],
+      AccessControlAllowHeaders: headers['access-control-allow-headers'],
+      AccessControlExposeHeaders: headers['access-control-expose-headers'],
+      AccessControlMaxAge: headers['access-control-max-age'],
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 /**
@@ -1218,115 +1219,115 @@ function optionsObject(params, callback) {
  *     @param  {String}  x-cos-meta-*                   允许用户自定义的头部信息，将作为 Object 元数据返回。大小限制2K。
  */
 function putObjectCopy(params, callback) {
-    submitRequest.call(this, {
-        method: 'PUT',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        VersionId: params.VersionId,
-        headers: params.Headers,
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        var result = util.clone(data.CopyObjectResult || {});
-        util.extend(result, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-        callback(null, result);
+  submitRequest.call(this, {
+    method: 'PUT',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    VersionId: params.VersionId,
+    headers: params.Headers,
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    var result = util.clone(data.CopyObjectResult || {});
+    util.extend(result, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+    callback(null, result);
+  });
 }
 
 function uploadPartCopy(params, callback) {
-    submitRequest.call(this, {
-        method: 'PUT',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        VersionId: params.VersionId,
-        qs: {
-            partNumber: params['PartNumber'],
-            uploadId: params['UploadId'],
-        },
-        headers: params.Headers,
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        var result = util.clone(data.CopyPartResult || {});
-        util.extend(result, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-        callback(null, result);
+  submitRequest.call(this, {
+    method: 'PUT',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    VersionId: params.VersionId,
+    qs: {
+      partNumber: params['PartNumber'],
+      uploadId: params['UploadId'],
+    },
+    headers: params.Headers,
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    var result = util.clone(data.CopyPartResult || {});
+    util.extend(result, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+    callback(null, result);
+  });
 }
 
 function deleteMultipleObject(params, callback) {
-    var Objects = params.Objects || {};
-    var Quiet = params.Quiet;
+  var Objects = params.Objects || {};
+  var Quiet = params.Quiet;
 
-    var xml = util.json2xml({Delete: {Object: Objects, Quiet: Quiet || false}});
+  var xml = util.json2xml({Delete: {Object: Objects, Quiet: Quiet || false}});
 
-    var headers = params.Headers;
-    headers['Content-Type'] = 'application/xml';
-    headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+  var headers = params.Headers;
+  headers['Content-Type'] = 'application/xml';
+  headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
 
-    submitRequest.call(this, {
-        method: 'POST',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        body: xml,
-        action: 'delete',
-        headers: headers,
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        var DeleteResult = data.DeleteResult || {};
-        var Deleted = DeleteResult.Deleted || [];
-        var Errors = DeleteResult.Error || [];
+  submitRequest.call(this, {
+    method: 'POST',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    body: xml,
+    action: 'delete',
+    headers: headers,
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    var DeleteResult = data.DeleteResult || {};
+    var Deleted = DeleteResult.Deleted || [];
+    var Errors = DeleteResult.Error || [];
 
-        Deleted = util.isArray(Deleted) ? Deleted : [Deleted];
-        Errors = util.isArray(Errors) ? Errors : [Errors];
+    Deleted = util.isArray(Deleted) ? Deleted : [Deleted];
+    Errors = util.isArray(Errors) ? Errors : [Errors];
 
-        var result = util.clone(DeleteResult);
-        util.extend(result, {
-            Error: Errors,
-            Deleted: Deleted,
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-        callback(null, result);
+    var result = util.clone(DeleteResult);
+    util.extend(result, {
+      Error: Errors,
+      Deleted: Deleted,
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+    callback(null, result);
+  });
 }
 
 function restoreObject(params, callback) {
-    var headers = params.Headers;
-    if (!params['RestoreRequest']) {
-        callback({error: 'missing param RestoreRequest'});
-        return;
-    }
+  var headers = params.Headers;
+  if (!params['RestoreRequest']) {
+    callback({error: 'missing param RestoreRequest'});
+    return;
+  }
 
-    var RestoreRequest = params.RestoreRequest || {};
-    var xml = util.json2xml({RestoreRequest: RestoreRequest});
+  var RestoreRequest = params.RestoreRequest || {};
+  var xml = util.json2xml({RestoreRequest: RestoreRequest});
 
-    headers['Content-Type'] = 'application/xml';
-    headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+  headers['Content-Type'] = 'application/xml';
+  headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
 
-    submitRequest.call(this, {
-        method: 'POST',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        VersionId: params.VersionId,
-        body: xml,
-        action: 'restore',
-        headers: headers,
-    }, function (err, data) {
-        callback(err, data);
-    });
+  submitRequest.call(this, {
+    method: 'POST',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    VersionId: params.VersionId,
+    body: xml,
+    action: 'restore',
+    headers: headers,
+  }, function (err, data) {
+    callback(err, data);
+  });
 }
 
 
@@ -1356,26 +1357,26 @@ function restoreObject(params, callback) {
  * @return  {Object}  data                                      返回的数据
  */
 function multipartInit(params, callback) {
-    submitRequest.call(this, {
-        method: 'POST',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        action: 'uploads',
-        headers: params.Headers,
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        data = util.clone(data || {});
-        if (data && data.InitiateMultipartUploadResult) {
-            return callback(null, util.extend(data.InitiateMultipartUploadResult, {
-                statusCode: data.statusCode,
-                headers: data.headers,
-            }));
-        }
-        callback(null, data);
-    });
+  submitRequest.call(this, {
+    method: 'POST',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    action: 'uploads',
+    headers: params.Headers,
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    data = util.clone(data || {});
+    if (data && data.InitiateMultipartUploadResult) {
+      return callback(null, util.extend(data.InitiateMultipartUploadResult, {
+        statusCode: data.statusCode,
+        headers: data.headers,
+      }));
+    }
+    callback(null, data);
+  });
 }
 
 /**
@@ -1396,33 +1397,33 @@ function multipartInit(params, callback) {
  */
 function multipartUpload(params, callback) {
 
-    var self = this;
-    util.getFileSize('multipartUpload', params, function () {
-        submitRequest.call(self, {
-            TaskId: params.TaskId,
-            method: 'PUT',
-            Bucket: params.Bucket,
-            Region: params.Region,
-            Key: params.Key,
-            qs: {
-                partNumber: params['PartNumber'],
-                uploadId: params['UploadId'],
-            },
-            headers: params.Headers,
-            onProgress: params.onProgress,
-            body: params.Body || null
-        }, function (err, data) {
-            if (err) {
-                return callback(err);
-            }
-            data['headers'] = data['headers'] || {};
-            callback(null, {
-                ETag: data['headers']['etag'] || '',
-                statusCode: data.statusCode,
-                headers: data.headers,
-            });
-        });
+  var self = this;
+  util.getFileSize('multipartUpload', params, function () {
+    submitRequest.call(self, {
+      TaskId: params.TaskId,
+      method: 'PUT',
+      Bucket: params.Bucket,
+      Region: params.Region,
+      Key: params.Key,
+      qs: {
+        partNumber: params['PartNumber'],
+        uploadId: params['UploadId'],
+      },
+      headers: params.Headers,
+      onProgress: params.onProgress,
+      body: params.Body || null
+    }, function (err, data) {
+      if (err) {
+        return callback(err);
+      }
+      data['headers'] = data['headers'] || {};
+      callback(null, {
+        ETag: data['headers']['etag'] || '',
+        statusCode: data.statusCode,
+        headers: data.headers,
+      });
     });
+  });
 
 }
 
@@ -1441,56 +1442,56 @@ function multipartUpload(params, callback) {
  *     @return  {Object}  data.CompleteMultipartUpload  完成分块上传后的文件信息，包括Location, Bucket, Key 和 ETag
  */
 function multipartComplete(params, callback) {
-    var self = this;
+  var self = this;
 
-    var UploadId = params.UploadId;
+  var UploadId = params.UploadId;
 
-    var Parts = params['Parts'];
+  var Parts = params['Parts'];
 
-    for (var i = 0, len = Parts.length; i < len; i++) {
-        if (Parts[i]['ETag'].indexOf('"') === 0) {
-            continue;
-        }
-        Parts[i]['ETag'] = '"' + Parts[i]['ETag'] + '"';
+  for (var i = 0, len = Parts.length; i < len; i++) {
+    if (Parts[i]['ETag'].indexOf('"') === 0) {
+      continue;
     }
+    Parts[i]['ETag'] = '"' + Parts[i]['ETag'] + '"';
+  }
 
-    var xml = util.json2xml({CompleteMultipartUpload: {Part: Parts}});
+  var xml = util.json2xml({CompleteMultipartUpload: {Part: Parts}});
 
-    var headers = params.Headers;
-    headers['Content-Type'] = 'application/xml';
-    headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
+  var headers = params.Headers;
+  headers['Content-Type'] = 'application/xml';
+  headers['Content-MD5'] = util.binaryBase64(util.md5(xml));
 
-    submitRequest.call(this, {
-        method: 'POST',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        qs: {
-            uploadId: UploadId
-        },
-        body: xml,
-        headers: headers,
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        var url = getUrl({
-            ForcePathStyle: self.options.ForcePathStyle,
-            protocol: self.options.Protocol,
-            domain: self.options.Domain,
-            bucket: params.Bucket,
-            region: params.Region,
-            object: params.Key,
-            isLocation: true,
-        });
-        var CompleteMultipartUploadResult = data.CompleteMultipartUploadResult || {};
-        var result = util.extend(CompleteMultipartUploadResult, {
-            Location: url,
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-        callback(null, result);
+  submitRequest.call(this, {
+    method: 'POST',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    qs: {
+      uploadId: UploadId
+    },
+    body: xml,
+    headers: headers,
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    var url = getUrl({
+      ForcePathStyle: self.options.ForcePathStyle,
+      protocol: self.options.Protocol,
+      domain: self.options.Domain,
+      bucket: params.Bucket,
+      region: params.Region,
+      object: params.Key,
+      isLocation: true,
     });
+    var CompleteMultipartUploadResult = data.CompleteMultipartUploadResult || {};
+    var result = util.extend(CompleteMultipartUploadResult, {
+      Location: url,
+      statusCode: data.statusCode,
+      headers: data.headers,
+    });
+    callback(null, result);
+  });
 }
 
 /**
@@ -1510,49 +1511,49 @@ function multipartComplete(params, callback) {
  *     @return  {Object}  data.ListMultipartUploadsResult   分块上传任务信息
  */
 function multipartList(params, callback) {
-    var reqParams = {};
+  var reqParams = {};
 
-    reqParams['delimiter'] = params['Delimiter'];
-    reqParams['encoding-type'] = params['EncodingType'];
-    reqParams['prefix'] = params['Prefix'];
+  reqParams['delimiter'] = params['Delimiter'];
+  reqParams['encoding-type'] = params['EncodingType'];
+  reqParams['prefix'] = params['Prefix'];
 
-    reqParams['max-uploads'] = params['MaxUploads'];
+  reqParams['max-uploads'] = params['MaxUploads'];
 
-    reqParams['key-marker'] = params['KeyMarker'];
-    reqParams['upload-id-marker'] = params['UploadIdMarker'];
+  reqParams['key-marker'] = params['KeyMarker'];
+  reqParams['upload-id-marker'] = params['UploadIdMarker'];
 
-    reqParams = util.clearKey(reqParams);
+  reqParams = util.clearKey(reqParams);
 
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        headers: params.Headers,
-        qs: reqParams,
-        action: 'uploads',
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    headers: params.Headers,
+    qs: reqParams,
+    action: 'uploads',
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
 
-        if (data && data.ListMultipartUploadsResult) {
-            var Upload = data.ListMultipartUploadsResult.Upload || [];
+    if (data && data.ListMultipartUploadsResult) {
+      var Upload = data.ListMultipartUploadsResult.Upload || [];
 
-            var CommonPrefixes = data.ListMultipartUploadsResult.CommonPrefixes || [];
+      var CommonPrefixes = data.ListMultipartUploadsResult.CommonPrefixes || [];
 
-            CommonPrefixes = util.isArray(CommonPrefixes) ? CommonPrefixes : [CommonPrefixes];
-            Upload = util.isArray(Upload) ? Upload : [Upload];
+      CommonPrefixes = util.isArray(CommonPrefixes) ? CommonPrefixes : [CommonPrefixes];
+      Upload = util.isArray(Upload) ? Upload : [Upload];
 
-            data.ListMultipartUploadsResult.Upload = Upload;
-            data.ListMultipartUploadsResult.CommonPrefixes = CommonPrefixes;
-        }
-        var result = util.clone(data.ListMultipartUploadsResult || {});
-        util.extend(result, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-        callback(null, result);
+      data.ListMultipartUploadsResult.Upload = Upload;
+      data.ListMultipartUploadsResult.CommonPrefixes = CommonPrefixes;
+    }
+    var result = util.clone(data.ListMultipartUploadsResult || {});
+    util.extend(result, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+    callback(null, result);
+  });
 }
 
 /**
@@ -1571,36 +1572,36 @@ function multipartList(params, callback) {
  *     @return  {Object}  data.ListMultipartUploadsResult   分块信息
  */
 function multipartListPart(params, callback) {
-    var reqParams = {};
+  var reqParams = {};
 
-    reqParams['uploadId'] = params['UploadId'];
-    reqParams['encoding-type'] = params['EncodingType'];
-    reqParams['max-parts'] = params['MaxParts'];
-    reqParams['part-number-marker'] = params['PartNumberMarker'];
+  reqParams['uploadId'] = params['UploadId'];
+  reqParams['encoding-type'] = params['EncodingType'];
+  reqParams['max-parts'] = params['MaxParts'];
+  reqParams['part-number-marker'] = params['PartNumberMarker'];
 
-    submitRequest.call(this, {
-        method: 'GET',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        headers: params.Headers,
-        qs: reqParams,
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        var ListPartsResult = data.ListPartsResult || {};
-        var Part = ListPartsResult.Part || [];
-        Part = util.isArray(Part) ? Part : [Part];
+  submitRequest.call(this, {
+    method: 'GET',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    headers: params.Headers,
+    qs: reqParams,
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    var ListPartsResult = data.ListPartsResult || {};
+    var Part = ListPartsResult.Part || [];
+    Part = util.isArray(Part) ? Part : [Part];
 
-        ListPartsResult.Part = Part;
-        var result = util.clone(ListPartsResult);
-        util.extend(result, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
-        callback(null, result);
+    ListPartsResult.Part = Part;
+    var result = util.clone(ListPartsResult);
+    util.extend(result, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+    callback(null, result);
+  });
 }
 
 /**
@@ -1615,25 +1616,25 @@ function multipartListPart(params, callback) {
  *     @return  {Object}    data            返回的数据
  */
 function multipartAbort(params, callback) {
-    var reqParams = {};
+  var reqParams = {};
 
-    reqParams['uploadId'] = params['UploadId'];
-    submitRequest.call(this, {
-        method: 'DELETE',
-        Bucket: params.Bucket,
-        Region: params.Region,
-        Key: params.Key,
-        headers: params.Headers,
-        qs: reqParams,
-    }, function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        callback(null, {
-            statusCode: data.statusCode,
-            headers: data.headers,
-        });
+  reqParams['uploadId'] = params['UploadId'];
+  submitRequest.call(this, {
+    method: 'DELETE',
+    Bucket: params.Bucket,
+    Region: params.Region,
+    Key: params.Key,
+    headers: params.Headers,
+    qs: reqParams,
+  }, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+    callback(null, {
+      statusCode: data.statusCode,
+      headers: data.headers,
     });
+  });
 }
 
 /**
@@ -1645,15 +1646,15 @@ function multipartAbort(params, callback) {
  * @return  {String}  data              返回签名字符串
  */
 function getAuth(params) {
-    return util.getAuth({
-        SecretId: params.SecretId || this.options.SecretId || '',
-        SecretKey: params.SecretKey || this.options.SecretKey || '',
-        Method: params.Method,
-        Key: params.Key,
-        Query: params.Query,
-        Headers: params.Headers,
-        Expires: params.Expires,
-    });
+  return util.getAuth({
+    SecretId: params.SecretId || this.options.SecretId || '',
+    SecretKey: params.SecretKey || this.options.SecretKey || '',
+    Method: params.Method,
+    Key: params.Key,
+    Query: params.Query,
+    Headers: params.Headers,
+    Expires: params.Expires,
+  });
 }
 
 /**
@@ -1669,43 +1670,43 @@ function getAuth(params) {
  *     @return  {Object}    data            返回的数据
  */
 function getObjectUrl(params, callback) {
-    var self = this;
-    var url = getUrl({
-        ForcePathStyle: self.options.ForcePathStyle,
-        protocol: params.Protocol || self.options.Protocol,
-        domain: self.options.Domain,
-        bucket: params.Bucket,
-        region: params.Region,
-        object: params.Key,
-        type: params.Type,
+  var self = this;
+  var url = getUrl({
+    ForcePathStyle: self.options.ForcePathStyle,
+    protocol: params.Protocol || self.options.Protocol,
+    domain: self.options.Domain,
+    bucket: params.Bucket,
+    region: params.Region,
+    object: params.Key,
+    type: params.Type,
+  });
+  if (params.Sign !== undefined && !params.Sign) {
+    callback(null, {Url: url});
+    return url;
+  }
+  var authorization = getAuthorizationAsync.call(this, {
+    Bucket: params.Bucket || '',
+    Region: params.Region || '',
+    Method: params.Method || 'get',
+    Key: params.Key,
+    Expires: params.Expires,
+  }, function (AuthData) {
+    if (!callback) return;
+    var signUrl = url;
+    signUrl += '?sign=' + encodeURIComponent(AuthData.Authorization);
+    AuthData.XCosSecurityToken && (signUrl += '&x-cos-security-token=' + AuthData.XCosSecurityToken);
+    AuthData.ClientIP && (signUrl += '&clientIP=' + AuthData.ClientIP);
+    AuthData.ClientUA && (signUrl += '&clientUA=' + AuthData.ClientUA);
+    AuthData.Token && (signUrl += '&token=' + AuthData.Token);
+    setTimeout(function () {
+      callback(null, {Url: signUrl});
     });
-    if (params.Sign !== undefined && !params.Sign) {
-        callback(null, {Url: url});
-        return url;
-    }
-    var authorization = getAuthorizationAsync.call(this, {
-        Bucket: params.Bucket || '',
-        Region: params.Region || '',
-        Method: params.Method || 'get',
-        Key: params.Key,
-        Expires: params.Expires,
-    }, function (AuthData) {
-        if (!callback) return;
-        var signUrl = url;
-        signUrl += '?sign=' + encodeURIComponent(AuthData.Authorization);
-        AuthData.XCosSecurityToken && (signUrl += '&x-cos-security-token=' + AuthData.XCosSecurityToken);
-        AuthData.ClientIP && (signUrl += '&clientIP=' + AuthData.ClientIP);
-        AuthData.ClientUA && (signUrl += '&clientUA=' + AuthData.ClientUA);
-        AuthData.Token && (signUrl += '&token=' + AuthData.Token);
-        setTimeout(function () {
-            callback(null, {Url: signUrl});
-        });
-    });
-    if (authorization) {
-        return url + '?sign=' + encodeURIComponent(authorization);
-    } else {
-        return url;
-    }
+  });
+  if (authorization) {
+    return url + '?sign=' + encodeURIComponent(authorization);
+  } else {
+    return url;
+  }
 }
 
 
@@ -1713,449 +1714,450 @@ function getObjectUrl(params, callback) {
  * 私有方法
  */
 function decodeAcl(AccessControlPolicy) {
-    var result = {
-        GrantFullControl: [],
-        GrantWrite: [],
-        GrantRead: [],
-        GrantReadAcp: [],
-        GrantWriteAcp: [],
-        ACL: '',
-    };
-    var GrantMap = {
-        'FULL_CONTROL': 'GrantFullControl',
-        'WRITE': 'GrantWrite',
-        'READ': 'GrantRead',
-        'READ_ACP': 'GrantReadAcp',
-        'WRITE_ACP': 'GrantWriteAcp',
-    };
-    var Grant = AccessControlPolicy.AccessControlList.Grant;
-    if (Grant) {
-        Grant = util.isArray(Grant) ? Grant : [Grant];
+  var result = {
+    GrantFullControl: [],
+    GrantWrite: [],
+    GrantRead: [],
+    GrantReadAcp: [],
+    GrantWriteAcp: [],
+    ACL: '',
+  };
+  var GrantMap = {
+    'FULL_CONTROL': 'GrantFullControl',
+    'WRITE': 'GrantWrite',
+    'READ': 'GrantRead',
+    'READ_ACP': 'GrantReadAcp',
+    'WRITE_ACP': 'GrantWriteAcp',
+  };
+  var Grant = AccessControlPolicy.AccessControlList.Grant;
+  if (Grant) {
+    Grant = util.isArray(Grant) ? Grant : [Grant];
+  }
+  var PublicAcl = {READ: 0, WRITE: 0, FULL_CONTROL: 0};
+  Grant.length && util.each(Grant, function (item) {
+    if (item.Grantee.ID === 'qcs::cam::anyone:anyone' || item.Grantee.URI === 'http://cam.qcloud.com/groups/global/AllUsers') {
+      PublicAcl[item.Permission] = 1;
+    } else if (item.Grantee.ID !== AccessControlPolicy.Owner.ID) {
+      result[GrantMap[item.Permission]].push('id="' + item.Grantee.ID + '"');
     }
-    var PublicAcl = {READ: 0, WRITE: 0, FULL_CONTROL: 0};
-    Grant.length && util.each(Grant, function (item) {
-        if (item.Grantee.ID === 'qcs::cam::anyone:anyone' || item.Grantee.URI === 'http://cam.qcloud.com/groups/global/AllUsers') {
-            PublicAcl[item.Permission] = 1;
-        } else if (item.Grantee.ID !== AccessControlPolicy.Owner.ID) {
-            result[GrantMap[item.Permission]].push('id="' + item.Grantee.ID + '"');
-        }
-    });
-    if (PublicAcl.FULL_CONTROL || (PublicAcl.WRITE && PublicAcl.READ)) {
-        result.ACL = 'public-read-write';
-    } else if (PublicAcl.READ) {
-        result.ACL = 'public-read';
-    } else {
-        result.ACL = 'private';
-    }
-    util.each(GrantMap, function (item) {
-        result[item] = uniqGrant(result[item].join(','));
-    });
-    return result;
+  });
+  if (PublicAcl.FULL_CONTROL || (PublicAcl.WRITE && PublicAcl.READ)) {
+    result.ACL = 'public-read-write';
+  } else if (PublicAcl.READ) {
+    result.ACL = 'public-read';
+  } else {
+    result.ACL = 'private';
+  }
+  util.each(GrantMap, function (item) {
+    result[item] = uniqGrant(result[item].join(','));
+  });
+  return result;
 }
 
 // Grant 去重
 function uniqGrant(str) {
-    var arr = str.split(',');
-    var exist = {};
-    var i, item;
-    for (i = 0; i < arr.length; ) {
-        item = arr[i].trim();
-        if (exist[item]) {
-            arr.splice(i, 1);
-        } else {
-            exist[item] = true;
-            arr[i] = item;
-            i++;
-        }
+  var arr = str.split(',');
+  var exist = {};
+  var i, item;
+  for (i = 0; i < arr.length; ) {
+    item = arr[i].trim();
+    if (exist[item]) {
+      arr.splice(i, 1);
+    } else {
+      exist[item] = true;
+      arr[i] = item;
+      i++;
     }
-    return arr.join(',');
+  }
+  return arr.join(',');
 }
 
 // 生成操作 url
 function getUrl(params) {
-    var longBucket = params.bucket;
-    var shortBucket = longBucket.substr(0, longBucket.lastIndexOf('-'));
-    var appId = longBucket.substr(longBucket.lastIndexOf('-') + 1);
-    var domain = params.domain;
-    var region = params.region;
-    var object = params.object;
-    var type = params.type || 'cos';
-    var protocol = params.protocol || (util.isBrowser && location.protocol === 'http:' ? 'http:' : 'https:');
-    if (!domain) {
-        if (['cn-south', 'cn-south-2', 'cn-north', 'cn-east', 'cn-southwest', 'sg'].indexOf(region) > -1) {
-            domain = '{Region}.myqcloud.com';
-        } else {
-            domain = '{Type}.{Region}.myqcloud.com';
-        }
-        if (!params.ForcePathStyle) {
-            domain = '{Bucket}.' + domain;
-        }
+  var longBucket = params.bucket;
+  var shortBucket = longBucket.substr(0, longBucket.lastIndexOf('-'));
+  var appId = longBucket.substr(longBucket.lastIndexOf('-') + 1);
+  var domain = params.domain;
+  var region = params.region;
+  var object = params.object;
+  var type = params.type || 'cos';
+  var protocol = params.protocol || (util.isBrowser && location.protocol === 'http:' ? 'http:' : 'https:');
+  if (!domain) {
+    if (['cn-south', 'cn-south-2', 'cn-north', 'cn-east', 'cn-southwest', 'sg'].indexOf(region) > -1) {
+      domain = '{Region}.myqcloud.com';
+    } else {
+      domain = '{Type}.{Region}.myqcloud.com';
     }
-    domain = domain.replace(/\{\{AppId\}\}/ig, appId)
-        .replace(/\{\{Bucket\}\}/ig, shortBucket)
-        .replace(/\{\{Region\}\}/ig, region)
-        .replace(/\{\{.*?\}\}/ig, '');
-    domain = domain.replace(/\{AppId\}/ig, appId)
-        .replace(/\{BucketName\}/ig, shortBucket)
-        .replace(/\{Bucket\}/ig, longBucket)
-        .replace(/\{Type\}/ig, type)
-        .replace(/\{Region\}/ig, region)
-        .replace(/\{.*?\}/ig, '');
-    if (!/^[a-zA-Z]+:\/\//.test(domain)) {
-        domain = protocol + '//' + domain;
+    if (!params.ForcePathStyle) {
+      domain = '{Bucket}.' + domain;
     }
+  }
+  domain = domain.replace(/\{\{AppId\}\}/ig, appId)
+    .replace(/\{\{Bucket\}\}/ig, shortBucket)
+    .replace(/\{\{Region\}\}/ig, region)
+    .replace(/\{\{.*?\}\}/ig, '');
+  domain = domain.replace(/\{AppId\}/ig, appId)
+    .replace(/\{BucketName\}/ig, shortBucket)
+    .replace(/\{Bucket\}/ig, longBucket)
+    .replace(/\{Type\}/ig, type)
+    .replace(/\{Region\}/ig, region)
+    .replace(/\{.*?\}/ig, '');
+  if (!/^[a-zA-Z]+:\/\//.test(domain)) {
+    domain = protocol + '//' + domain;
+  }
 
-    // 去掉域名最后的斜杆
-    if (domain.slice(-1) === '/') {
-        domain = domain.slice(0, -1);
-    }
-    var url = domain;
+  // 去掉域名最后的斜杆
+  if (domain.slice(-1) === '/') {
+    domain = domain.slice(0, -1);
+  }
+  var url = domain;
 
-    if (params.ForcePathStyle) {
-        url += '/' + longBucket;
-    }
-    url += '/';
-    if (object) {
-        url += encodeURIComponent(object)
-            .replace(/%2F/g, '/')
-            .replace(/%3F/g, '?');
-    }
+  if (params.ForcePathStyle) {
+    url += '/' + longBucket;
+  }
+  url += '/';
+  if (object) {
+    url += encodeURIComponent(object)
+      .replace(/%2F/g, '/')
+      .replace(/%3F/g, '?');
+  }
 
-    if (params.isLocation) {
-        url = url.replace(/^https?:\/\//, '');
-    }
-    return url;
+  if (params.isLocation) {
+    url = url.replace(/^https?:\/\//, '');
+  }
+  return url;
 }
 
 // 异步获取签名
 function getAuthorizationAsync(params, callback) {
-    var self = this;
-    var Bucket = params.Bucket || '';
-    var Region = params.Region || '';
-    self._StsMap = self._StsMap || {};
-    var StsData = self._StsMap[Bucket + '.' + Region] || {};
+  var self = this;
+  var Bucket = params.Bucket || '';
+  var Region = params.Region || '';
+  self._StsMap = self._StsMap || {};
+  var StsData = self._StsMap[Bucket + '.' + Region] || {};
 
-    var PathName = params.Key || '';
-    if (self.options.ForcePathStyle && Bucket) {
-        PathName = Bucket + '/' + PathName;
-    }
+  var PathName = params.Key || '';
+  if (self.options.ForcePathStyle && Bucket) {
+    PathName = Bucket + '/' + PathName;
+  }
 
-    var calcAuthByTmpKey = function () {
-        var Authorization = util.getAuth({
-            SecretId: StsData.TmpSecretId,
-            SecretKey: StsData.TmpSecretKey,
-            Method: params.Method,
-            Key: PathName,
-            Query: params.Query,
-            Headers: params.Headers,
-        });
-        var AuthData = {
-            Authorization: Authorization,
-            XCosSecurityToken: StsData.XCosSecurityToken || '',
-            Token: StsData.Token || '',
-            ClientIP: StsData.ClientIP || '',
-            ClientUA: StsData.ClientUA || '',
-        };
-        callback && callback(AuthData);
+  var calcAuthByTmpKey = function () {
+    var Authorization = util.getAuth({
+      SecretId: StsData.TmpSecretId,
+      SecretKey: StsData.TmpSecretKey,
+      Method: params.Method,
+      Key: PathName,
+      Query: params.Query,
+      Headers: params.Headers,
+    });
+    var AuthData = {
+      Authorization: Authorization,
+      XCosSecurityToken: StsData.XCosSecurityToken || '',
+      Token: StsData.Token || '',
+      ClientIP: StsData.ClientIP || '',
+      ClientUA: StsData.ClientUA || '',
     };
+    callback && callback(AuthData);
+  };
 
-    // 先判断是否有临时密钥
-    if (StsData.ExpiredTime && StsData.ExpiredTime - (Date.now() / 1000) > 60) { // 如果缓存的临时密钥有效，并还有超过60秒有效期就直接使用
+  // 先判断是否有临时密钥
+  if (StsData.ExpiredTime && StsData.ExpiredTime - (Date.now() / 1000) > 60) { // 如果缓存的临时密钥有效，并还有超过60秒有效期就直接使用
+    calcAuthByTmpKey();
+  } else if (self.options.getAuthorization) { // 外部计算签名或获取临时密钥
+    self.options.getAuthorization.call(self, {
+      Bucket: Bucket,
+      Region: Region,
+      Method: params.Method,
+      Key: PathName,
+      Query: params.Query,
+      Headers: params.Headers,
+    }, function (AuthData) {
+      if (typeof AuthData === 'string') {
+        AuthData = {Authorization: AuthData};
+      }
+      if (AuthData.TmpSecretId &&
+        AuthData.TmpSecretKey &&
+        AuthData.XCosSecurityToken &&
+        AuthData.ExpiredTime) {
+        StsData = self._StsMap[Bucket + '.' + Region] = AuthData;
         calcAuthByTmpKey();
-    } else if (self.options.getAuthorization) { // 外部计算签名或获取临时密钥
-        self.options.getAuthorization.call(self, {
-            Bucket: Bucket,
-            Region: Region,
-            Method: params.Method,
-            Key: PathName,
-            Query: params.Query,
-            Headers: params.Headers,
-        }, function (AuthData) {
-            if (typeof AuthData === 'string') {
-                AuthData = {Authorization: AuthData};
-            }
-            if (AuthData.TmpSecretId &&
-                AuthData.TmpSecretKey &&
-                AuthData.XCosSecurityToken &&
-                AuthData.ExpiredTime) {
-                StsData = self._StsMap[Bucket + '.' + Region] = AuthData;
-                calcAuthByTmpKey();
-            } else {
-                callback && callback(AuthData);
-            }
-        });
-    } else if (self.options.getSTS) { // 外部获取临时密钥
-        self.options.getSTS.call(self, {
-            Bucket: Bucket,
-            Region: Region,
-        }, function (data) {
-            StsData = self._StsMap[Bucket + '.' + Region] = data || {};
-            StsData.TmpSecretId = StsData.SecretId;
-            StsData.TmpSecretKey = StsData.SecretKey;
-            calcAuthByTmpKey();
-        });
-    } else { // 内部计算获取签名
-        var Authorization = util.getAuth({
-            SecretId: params.SecretId || self.options.SecretId,
-            SecretKey: params.SecretKey || self.options.SecretKey,
-            Method: params.Method,
-            Key: PathName,
-            Query: params.Query,
-            Headers: params.Headers,
-            Expires: params.Expires,
-        });
-        callback && callback({Authorization: Authorization});
-        return Authorization;
-    }
-    return '';
+      } else {
+        callback && callback(AuthData);
+      }
+    });
+  } else if (self.options.getSTS) { // 外部获取临时密钥
+    self.options.getSTS.call(self, {
+      Bucket: Bucket,
+      Region: Region,
+    }, function (data) {
+      StsData = self._StsMap[Bucket + '.' + Region] = data || {};
+      StsData.TmpSecretId = StsData.SecretId;
+      StsData.TmpSecretKey = StsData.SecretKey;
+      calcAuthByTmpKey();
+    });
+  } else { // 内部计算获取签名
+    var Authorization = util.getAuth({
+      SecretId: params.SecretId || self.options.SecretId,
+      SecretKey: params.SecretKey || self.options.SecretKey,
+      Method: params.Method,
+      Key: PathName,
+      Query: params.Query,
+      Headers: params.Headers,
+      Expires: params.Expires,
+    });
+    callback && callback({Authorization: Authorization});
+    return Authorization;
+  }
+  return '';
 }
 
 // 获取签名并发起请求
 function submitRequest(params, callback) {
-    var self = this;
+  var self = this;
 
-    // 处理 headers
-    !params.headers && (params.headers = {});
+  // 处理 headers
+  !params.headers && (params.headers = {});
 
-    // 处理 query
-    !params.qs && (params.qs = {});
-    params.VersionId && (params.qs.versionId = params.VersionId);
-    params.qs = util.clearKey(params.qs);
+  // 处理 query
+  !params.qs && (params.qs = {});
+  params.VersionId && (params.qs.versionId = params.VersionId);
+  params.qs = util.clearKey(params.qs);
 
-    // 清理 undefined 和 null 字段
-    params.headers && (params.headers = util.clearKey(params.headers));
-    params.qs && (params.qs = util.clearKey(params.qs));
+  // 清理 undefined 和 null 字段
+  params.headers && (params.headers = util.clearKey(params.headers));
+  params.qs && (params.qs = util.clearKey(params.qs));
 
-    var Query = util.clone(params.qs);
-    params.action && (Query[params.action] = '');
-    getAuthorizationAsync.call(self, {
-        Bucket: params.Bucket || '',
-        Region: params.Region || '',
-        Method: params.method,
-        Key: params.Key,
-        Query: Query,
-        Headers: params.headers,
-    }, function (AuthData) {
+  var Query = util.clone(params.qs);
+  params.action && (Query[params.action] = '');
+  getAuthorizationAsync.call(self, {
+    Bucket: params.Bucket || '',
+    Region: params.Region || '',
+    Method: params.method,
+    Key: params.Key,
+    Query: Query,
+    Headers: params.headers,
+  }, function (AuthData) {
 
-        // 检查签名格式
-        var auth = AuthData.Authorization;
-        var formatAllow = false;
-        if (auth) {
-            if (auth.indexOf(' ') > -1) {
-                formatAllow = false;
-            } else if (auth.indexOf('q-sign-algorithm=') > -1 &&
-                auth.indexOf('q-ak=') > -1 &&
-                auth.indexOf('q-sign-time=') > -1 &&
-                auth.indexOf('q-key-time=') > -1 &&
-                auth.indexOf('q-url-param-list=') > -1) {
-                formatAllow = true;
-            } else {
-                try {
-                    auth = atob(auth);
-                    if (auth.indexOf('a=') > -1 &&
-                        auth.indexOf('k=') > -1 &&
-                        auth.indexOf('t=') > -1 &&
-                        auth.indexOf('r=') > -1 &&
-                        auth.indexOf('b=') > -1) {
-                        formatAllow = true;
-                    }
-                } catch (e) {}
-            }
-        }
-        if (!formatAllow) {
-            callback('authorization error');
-            return;
-        }
+    // 检查签名格式
+    var auth = AuthData.Authorization;
+    var formatAllow = false;
+    if (auth) {
+      if (auth.indexOf(' ') > -1) {
+        formatAllow = false;
+      } else if (auth.indexOf('q-sign-algorithm=') > -1 &&
+        auth.indexOf('q-ak=') > -1 &&
+        auth.indexOf('q-sign-time=') > -1 &&
+        auth.indexOf('q-key-time=') > -1 &&
+        auth.indexOf('q-url-param-list=') > -1) {
+        formatAllow = true;
+      } else {
+        try {
+          auth = atob(auth);
+          if (auth.indexOf('a=') > -1 &&
+            auth.indexOf('k=') > -1 &&
+            auth.indexOf('t=') > -1 &&
+            auth.indexOf('r=') > -1 &&
+            auth.indexOf('b=') > -1) {
+            formatAllow = true;
+          }
+        } catch (e) {}
+      }
+    }
+    if (!formatAllow) {
+      callback('authorization error');
+      return;
+    }
 
-        params.AuthData = AuthData;
-        _submitRequest.call(self, params, callback);
-    });
+    params.AuthData = AuthData;
+    _submitRequest.call(self, params, callback);
+  });
 }
 
 // 发起请求
 function _submitRequest(params, callback) {
-    var self = this;
-    var TaskId = params.TaskId;
-    if (TaskId && !self._isRunningTask(TaskId)) return;
+  var self = this;
+  var TaskId = params.TaskId;
+  if (TaskId && !self._isRunningTask(TaskId)) return;
 
-    var bucket = params.Bucket;
-    var region = params.Region;
-    var object = params.Key;
-    var method = params.method || 'GET';
-    var url = params.url;
-    var body = params.body;
-    var json = params.json;
-    var rawBody = params.rawBody;
+  var bucket = params.Bucket;
+  var region = params.Region;
+  var object = params.Key;
+  var method = params.method || 'GET';
+  var env = params.env;
+  var url = params.url;
+  var body = params.body;
+  var json = params.json;
+  var rawBody = params.rawBody;
 
-    // url
-    url = url || getUrl({
-        ForcePathStyle: self.options.ForcePathStyle,
-        protocol: self.options.Protocol,
-        domain: self.options.Domain,
-        bucket: bucket,
-        region: region,
-        object: object,
-    });
-    if (params.action) {
-        url = url + '?' + params.action;
-    }
+  // url
+  url = url || getUrl({
+    ForcePathStyle: self.options.ForcePathStyle,
+    protocol: self.options.Protocol,
+    domain: self.options.Domain,
+    bucket: bucket,
+    region: region,
+    object: object
+  });
+  if (params.action) {
+    url = url + '?' + params.action;
+  }
+  console.log(url)
+  var opt = {
+    method: method,
+    url: url + '?env='+env,
+    headers: params.headers,
+    qs: params.qs,
+    body: body,
+    json: json,
+    rawBody: rawBody
+  };
 
-    var opt = {
-        method: method,
-        url: url,
-        headers: params.headers,
-        qs: params.qs,
-        body: body,
-        json: json,
-        rawBody: rawBody
+  // 获取签名
+  opt.headers.Authorization = params.AuthData.Authorization;
+  params.AuthData.Token && (opt.headers['token'] = params.AuthData.Token);
+  params.AuthData.ClientIP && (opt.headers['clientIP'] = params.AuthData.ClientIP);
+  params.AuthData.ClientUA && (opt.headers['clientUA'] = params.AuthData.ClientUA);
+  params.AuthData.XCosSecurityToken && (opt.headers['x-cos-security-token'] = params.AuthData.XCosSecurityToken);
+
+  // 清理 undefined 和 null 字段
+  opt.headers && (opt.headers = util.clearKey(opt.headers));
+  opt = util.clearKey(opt);
+
+  // progress
+  if (params.onProgress && typeof params.onProgress === 'function') {
+    var contentLength = body && (body.size || body.length) || 0;
+    opt.onProgress = function (e) {
+      if (TaskId && !self._isRunningTask(TaskId)) return;
+      var loaded = e ? e.loaded : 0;
+      params.onProgress({loaded: loaded, total: contentLength});
+    };
+  }
+  self.emit('before-send', opt);
+  var sender = REQUEST(opt, function (err, response, body) {
+
+    // 返回内容添加 状态码 和 headers
+    var hasReturned;
+    var cb = function (err, data) {
+      TaskId && self.off('inner-kill-task', killTask);
+      if (hasReturned) return;
+      hasReturned = true;
+      var attrs = {};
+      response && response.statusCode && (attrs.statusCode = response.statusCode);
+      response && response.headers && (attrs.headers = response.headers);
+
+      if (err) {
+        err = util.extend(err || {}, attrs);
+        callback(err, null);
+      } else {
+        data = util.extend(data || {}, attrs);
+        callback(null, data);
+      }
     };
 
-    // 获取签名
-    opt.headers.Authorization = params.AuthData.Authorization;
-    params.AuthData.Token && (opt.headers['token'] = params.AuthData.Token);
-    params.AuthData.ClientIP && (opt.headers['clientIP'] = params.AuthData.ClientIP);
-    params.AuthData.ClientUA && (opt.headers['clientUA'] = params.AuthData.ClientUA);
-    params.AuthData.XCosSecurityToken && (opt.headers['x-cos-security-token'] = params.AuthData.XCosSecurityToken);
-
-    // 清理 undefined 和 null 字段
-    opt.headers && (opt.headers = util.clearKey(opt.headers));
-    opt = util.clearKey(opt);
-
-    // progress
-    if (params.onProgress && typeof params.onProgress === 'function') {
-        var contentLength = body && (body.size || body.length) || 0;
-        opt.onProgress = function (e) {
-            if (TaskId && !self._isRunningTask(TaskId)) return;
-            var loaded = e ? e.loaded : 0;
-            params.onProgress({loaded: loaded, total: contentLength});
-        };
+    // 请求错误，发生网络错误
+    if (err) {
+      cb({error: err});
+      return;
     }
-    self.emit('before-send', opt);
-    var sender = REQUEST(opt, function (err, response, body) {
 
-        // 返回内容添加 状态码 和 headers
-        var hasReturned;
-        var cb = function (err, data) {
-            TaskId && self.off('inner-kill-task', killTask);
-            if (hasReturned) return;
-            hasReturned = true;
-            var attrs = {};
-            response && response.statusCode && (attrs.statusCode = response.statusCode);
-            response && response.headers && (attrs.headers = response.headers);
+    var jsonRes;
+    if (rawBody) {
+      jsonRes = {};
+      jsonRes.headers = response.headers;
+      jsonRes.headers = response.statusCode;
+      jsonRes.body = body;
+    } else {
+      try {
+        jsonRes = util.xml2json(body) || {};
+      } catch (e) {
+        jsonRes = body || {};
+      }
+      jsonRes.headers = response.headers;
+      // 请求返回码不为 200
+      var statusCode = response.statusCode;
+      var statusSuccess = Math.floor(statusCode / 100) === 2; // 200 202 204 206
+      if (!statusSuccess) {
+        cb({error: jsonRes.Error || jsonRes});
+        return;
+      }
 
-            if (err) {
-                err = util.extend(err || {}, attrs);
-                callback(err, null);
-            } else {
-                data = util.extend(data || {}, attrs);
-                callback(null, data);
-            }
-        };
-
-        // 请求错误，发生网络错误
-        if (err) {
-            cb({error: err});
-            return;
-        }
-
-        var jsonRes;
-        if (rawBody) {
-            jsonRes = {};
-            jsonRes.headers = response.headers;
-            jsonRes.headers = response.statusCode;
-            jsonRes.body = body;
-        } else {
-            try {
-            jsonRes = util.xml2json(body) || {};
-            } catch (e) {
-                jsonRes = body || {};
-            }
-            jsonRes.headers = response.headers;
-            // 请求返回码不为 200
-            var statusCode = response.statusCode;
-            var statusSuccess = Math.floor(statusCode / 100) === 2; // 200 202 204 206
-            if (!statusSuccess) {
-                cb({error: jsonRes.Error || jsonRes});
-                return;
-            }
-
-        }
+    }
 
 
-        // 不对 body 进行转换，body 直接挂载返回
+    // 不对 body 进行转换，body 直接挂载返回
 
-        if (jsonRes.Error) {
-            cb({error: jsonRes.Error});
-            return;
-        }
-        cb(null, jsonRes);
-    });
+    if (jsonRes.Error) {
+      cb({error: jsonRes.Error});
+      return;
+    }
+    cb(null, jsonRes);
+  });
 
-    // kill task
-    var killTask = function (data) {
-        if (data.TaskId === TaskId) {
-            sender && sender.abort && sender.abort();
-            self.off('inner-kill-task', killTask);
-        }
-    };
-    TaskId && self.on('inner-kill-task', killTask);
+  // kill task
+  var killTask = function (data) {
+    if (data.TaskId === TaskId) {
+      sender && sender.abort && sender.abort();
+      self.off('inner-kill-task', killTask);
+    }
+  };
+  TaskId && self.on('inner-kill-task', killTask);
 
 }
 
 
 var API_MAP = {
-    // Bucket 相关方法
-    getBucket: getBucket,
-    headBucket: headBucket,
-    deleteBucket: deleteBucket,
-    getBucketAcl: getBucketAcl,
-    putBucketAcl: putBucketAcl,
-    getBucketCors: getBucketCors,
-    putBucketCors: putBucketCors,
-    deleteBucketCors: deleteBucketCors,
-    getBucketLocation: getBucketLocation,
-    putBucketTagging: putBucketTagging,
-    getBucketTagging: getBucketTagging,
-    deleteBucketTagging: deleteBucketTagging,
-    getBucketPolicy: getBucketPolicy,
-    putBucketPolicy: putBucketPolicy,
-    deleteBucketPolicy: deleteBucketPolicy,
-    getBucketLifecycle: getBucketLifecycle,
-    putBucketLifecycle: putBucketLifecycle,
-    deleteBucketLifecycle: deleteBucketLifecycle,
-    putBucketVersioning: putBucketVersioning,
-    getBucketVersioning: getBucketVersioning,
-    putBucketReplication: putBucketReplication,
-    getBucketReplication: getBucketReplication,
-    deleteBucketReplication: deleteBucketReplication,
+  // Bucket 相关方法
+  getBucket: getBucket,
+  headBucket: headBucket,
+  deleteBucket: deleteBucket,
+  getBucketAcl: getBucketAcl,
+  putBucketAcl: putBucketAcl,
+  getBucketCors: getBucketCors,
+  putBucketCors: putBucketCors,
+  deleteBucketCors: deleteBucketCors,
+  getBucketLocation: getBucketLocation,
+  putBucketTagging: putBucketTagging,
+  getBucketTagging: getBucketTagging,
+  deleteBucketTagging: deleteBucketTagging,
+  getBucketPolicy: getBucketPolicy,
+  putBucketPolicy: putBucketPolicy,
+  deleteBucketPolicy: deleteBucketPolicy,
+  getBucketLifecycle: getBucketLifecycle,
+  putBucketLifecycle: putBucketLifecycle,
+  deleteBucketLifecycle: deleteBucketLifecycle,
+  putBucketVersioning: putBucketVersioning,
+  getBucketVersioning: getBucketVersioning,
+  putBucketReplication: putBucketReplication,
+  getBucketReplication: getBucketReplication,
+  deleteBucketReplication: deleteBucketReplication,
 
-    // Object 相关方法
-    getObject: getObject,
-    headObject: headObject,
-    listObjectVersions: listObjectVersions,
-    putObject: putObject,
-    deleteObject: deleteObject,
-    getObjectAcl: getObjectAcl,
-    putObjectAcl: putObjectAcl,
-    optionsObject: optionsObject,
-    putObjectCopy: putObjectCopy,
-    deleteMultipleObject: deleteMultipleObject,
-    restoreObject: restoreObject,
+  // Object 相关方法
+  getObject: getObject,
+  headObject: headObject,
+  listObjectVersions: listObjectVersions,
+  putObject: putObject,
+  deleteObject: deleteObject,
+  getObjectAcl: getObjectAcl,
+  putObjectAcl: putObjectAcl,
+  optionsObject: optionsObject,
+  putObjectCopy: putObjectCopy,
+  deleteMultipleObject: deleteMultipleObject,
+  restoreObject: restoreObject,
 
-    // 分块上传相关方法
-    uploadPartCopy: uploadPartCopy,
-    multipartInit: multipartInit,
-    multipartUpload: multipartUpload,
-    multipartComplete: multipartComplete,
-    multipartList: multipartList,
-    multipartListPart: multipartListPart,
-    multipartAbort: multipartAbort,
+  // 分块上传相关方法
+  uploadPartCopy: uploadPartCopy,
+  multipartInit: multipartInit,
+  multipartUpload: multipartUpload,
+  multipartComplete: multipartComplete,
+  multipartList: multipartList,
+  multipartListPart: multipartListPart,
+  multipartAbort: multipartAbort,
 
-    // 工具方法
-    getObjectUrl: getObjectUrl,
-    getAuth: getAuth,
+  // 工具方法
+  getObjectUrl: getObjectUrl,
+  getAuth: getAuth,
 };
 
 util.each(API_MAP, function (fn, apiName) {
-    exports[apiName] = util.apiWrapper(apiName, fn);
+  exports[apiName] = util.apiWrapper(apiName, fn);
 });
